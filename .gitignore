@@ -1,0 +1,16 @@
+# Visual Studio & Extensions
+[Bb]in/
+[Oo]bj/
+[Tt]est[Rr]esults/
+*.suo
+*.user
+*.Cache
+[Ss]tyle[Cc]op.*
+*.pfx
+
+# Operatiing system
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
