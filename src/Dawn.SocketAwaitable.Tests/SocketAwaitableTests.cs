@@ -153,6 +153,19 @@ namespace Dawn.Net.Sockets.Tests
             Assert.IsTrue(awaiter.IsCompleted);
             Assert.AreEqual(awaiter.GetResult(), default(SocketError));
         }
+
+        /// <summary>
+        ///     Tests <see cref="SocketAwaitable.Dispose" />.
+        /// </summary>
+        [TestMethod]
+        public void TestDisposing()
+        {
+            var awaitable = new SocketAwaitable();
+            Assert.IsFalse(awaitable.IsDisposed);
+
+            awaitable.Dispose();
+            Assert.IsTrue(awaitable.IsDisposed);
+        }
         #endregion
     }
 }

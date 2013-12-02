@@ -31,7 +31,7 @@ namespace Dawn.Net.Sockets
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly byte[] emptyArray = new byte[0];
-
+        
         /// <summary>
         ///     Asynchronous socket arguments for internal use.
         /// </summary>
@@ -39,9 +39,21 @@ namespace Dawn.Net.Sockets
         private readonly SocketAsyncEventArgs arguments = new SocketAsyncEventArgs();
 
         /// <summary>
+        ///     An object that can be used to synchronize access to the <see cref="SocketAwaitable" />.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly object syncRoot = new object();
+
+        /// <summary>
         ///     An awaiter that waits the completions of asynchronous socket operations.
         /// </summary>
         private readonly SocketAwaiter awaiter;
+
+        /// <summary>
+        ///     A value indicating whether the <see cref="SocketAwaitable" /> is disposed.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool isDisposed;
         #endregion
 
         #region Constructors
@@ -117,6 +129,14 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
+        ///     Gets a value indicating whether the <see cref="SocketAwaitable" /> is disposed.
+        /// </summary>
+        public bool IsDisposed
+        {
+            get { return this.isDisposed; }
+        }
+
+        /// <summary>
         ///     Gets the asynchronous socket arguments for internal use.
         /// </summary>
         internal SocketAsyncEventArgs Arguments
@@ -155,7 +175,12 @@ namespace Dawn.Net.Sockets
         /// </summary>
         public void Dispose()
         {
-            this.arguments.Dispose();
+            lock (this.syncRoot)
+                if (!this.IsDisposed)
+                {
+                    this.arguments.Dispose();
+                    this.isDisposed = true;
+                }
         }
         #endregion
     }
