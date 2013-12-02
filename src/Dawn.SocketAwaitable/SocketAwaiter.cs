@@ -50,7 +50,7 @@ namespace Dawn.Net.Sockets
         ///     A value indicating whether the asynchronous operation is completed.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool isCompleted;
+        private bool isCompleted = true;
         #endregion
 
         #region Constructors
