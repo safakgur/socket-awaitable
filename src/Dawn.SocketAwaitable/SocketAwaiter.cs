@@ -16,6 +16,7 @@ namespace Dawn.Net.Sockets
 {
     using System;
     using System.Diagnostics;
+    using System.Net.Sockets;
     using System.Runtime.CompilerServices;
     using System.Threading;
     using System.Threading.Tasks;
@@ -50,7 +51,7 @@ namespace Dawn.Net.Sockets
         ///     A value indicating whether the asynchronous operation is completed.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool isCompleted;
+        private bool isCompleted = true;
         #endregion
 
         #region Constructors
@@ -88,6 +89,17 @@ namespace Dawn.Net.Sockets
 
         #region Methods
         /// <summary>
+        ///     Gets the result of the asynchronous socket operation.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="SocketError" /> that represents the result of the socket operations.
+        /// </returns>
+        public SocketError GetResult()
+        {
+            return this.awaitable.Arguments.SocketError;
+        }
+
+        /// <summary>
         ///     Gets invoked when the asynchronous operation is completed and runs the specified delegate as
         ///     continuation.
         /// </summary>
@@ -107,6 +119,7 @@ namespace Dawn.Net.Sockets
         internal void Reset()
         {
             this.awaitable.Arguments.AcceptSocket = null;
+            this.awaitable.Arguments.SocketError = SocketError.AlreadyInProgress;
             this.IsCompleted = false;
             this.continuation = null;
         }
