@@ -204,11 +204,18 @@ namespace Dawn.Net.Sockets.Tests
         [TestMethod]
         public void TestAddingAfterDispose()
         {
-            var pool = new SocketAwaitablePool();
-            var awaitable = new SocketAwaitable();
-            
+            var count = 20;
+            var pool = new SocketAwaitablePool(count);
+            Assert.AreEqual(pool.Count, count);
+
             pool.Dispose();
+            Assert.AreEqual(pool.Count, 0);
+
+            var awaitable = new SocketAwaitable();
+            Assert.IsFalse(awaitable.IsDisposed);
+
             pool.Add(awaitable);
+            Assert.IsTrue(awaitable.IsDisposed);
         }
 
         /// <summary>
