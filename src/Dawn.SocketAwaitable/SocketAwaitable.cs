@@ -72,7 +72,7 @@ namespace Dawn.Net.Sockets
         public ArraySegment<byte> Buffer
         {
             get { return new ArraySegment<byte>(this.Arguments.Buffer ?? emptyArray, this.Arguments.Offset, this.Arguments.Count); }
-            set { this.Arguments.SetBuffer(value.Array, value.Offset, value.Count); }
+            set { this.Arguments.SetBuffer(value.Array ?? emptyArray, value.Offset, value.Count); }
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Dawn.Net.Sockets
         public void Clear()
         {
             this.Arguments.AcceptSocket = null;
-            this.Arguments.SetBuffer(null, 0, 0);
+            this.Arguments.SetBuffer(emptyArray, 0, 0);
             this.RemoteEndPoint = null;
             this.SocketFlags = SocketFlags.None;
             this.UserToken = null;
