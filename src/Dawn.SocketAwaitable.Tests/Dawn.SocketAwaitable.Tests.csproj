@@ -58,6 +58,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketAwaitableTests.cs" />
     <Compile Include="SocketExTests.cs" />
+    <Compile Include="SocketAwaitablePoolTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dawn.SocketAwaitable\Dawn.SocketAwaitable.csproj">
