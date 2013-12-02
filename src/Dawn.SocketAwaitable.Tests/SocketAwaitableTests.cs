@@ -151,6 +151,7 @@ namespace Dawn.Net.Sockets.Tests
             var awaitable = new SocketAwaitable();
             var awaiter = awaitable.GetAwaiter();
             Assert.IsTrue(awaiter.IsCompleted);
+            Assert.AreEqual(awaiter.GetResult(), default(SocketError));
         }
         #endregion
     }
