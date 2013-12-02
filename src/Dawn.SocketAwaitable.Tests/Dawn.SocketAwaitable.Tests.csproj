@@ -59,6 +59,7 @@
     <Compile Include="SocketAwaitableTests.cs" />
     <Compile Include="SocketExTests.cs" />
     <Compile Include="SocketAwaitablePoolTests.cs" />
+    <Compile Include="BlockingBufferManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dawn.SocketAwaitable\Dawn.SocketAwaitable.csproj">
