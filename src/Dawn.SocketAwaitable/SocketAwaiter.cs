@@ -63,12 +63,10 @@ namespace Dawn.Net.Sockets
         /// </param>
         internal SocketAwaiter(SocketAwaitable awaitable)
         {
-            if (awaitable == null)
-                throw new ArgumentNullException("awaitable", "Asynchronous socket arguments must not be null.");
-
             this.awaitable = awaitable;
             this.awaitable.Arguments.Completed += delegate
             {
+                this.IsCompleted = true;
                 var c = this.continuation ?? Interlocked.CompareExchange(ref this.continuation, sentinel, null);
                 if (c != null)
                     c.Invoke();
