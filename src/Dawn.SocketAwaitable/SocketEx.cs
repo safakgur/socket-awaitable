@@ -282,8 +282,11 @@ namespace Dawn.Net.Sockets
 
             if (awaitable == null)
                 throw new ArgumentNullException("awaitable", "Awaitable must not be null.");
-            
+
             var a = awaitable.GetAwaiter();
+            if (!a.IsCompleted)
+                throw new InvalidOperationException("A socket operation is already in progress using the same awaitable arguments.");
+
             a.Reset();
             try
             {
@@ -292,15 +295,15 @@ namespace Dawn.Net.Sockets
             }
             catch (SocketException x)
             {
+                a.IsCompleted = true;
                 awaitable.Arguments.SocketError = x.SocketErrorCode != SocketError.Success
                     ? x.SocketErrorCode
                     : SocketError.SocketError;
-
-                a.IsCompleted = true;
             }
             catch (Exception)
             {
                 a.IsCompleted = true;
+                awaitable.Arguments.SocketError = SocketError.Success;
                 throw;
             }
 
