@@ -32,7 +32,7 @@ namespace Dawn.Net.Sockets.Tests
         ///     <see cref="SocketEx.ReceiveAsync" /> and <see cref="SocketEx.SendAsync" /> methods.
         /// </summary>
         /// <returns>
-        ///     A task that represents the asynchronous testing operation.
+        ///     A <see cref="Task" /> that represents the asynchronous testing operation.
         /// </returns>
         [TestMethod]
         public async Task TestCommonOperations()
@@ -79,6 +79,8 @@ namespace Dawn.Net.Sockets.Tests
                         Assert.AreEqual(connectResult, SocketError.Success);
                     }
 
+                    await Task.Delay(500);
+
                     // Send.
                     using (var sendAwaitable = new SocketAwaitable())
                     {
@@ -92,6 +94,63 @@ namespace Dawn.Net.Sockets.Tests
                     await acceptReceiveTask;
                     Assert.AreEqual(acceptReceiveTask.Status, TaskStatus.RanToCompletion);
                 }
+            }
+        }
+
+        /// <summary>
+        ///     Tests the awaiters before and after calling <see cref="SocketEx" /> methods.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="Task" /> that represents the asynchronous testing operation.
+        /// </returns>
+        [TestMethod]
+        public async Task TestAwaiterStatus()
+        {
+            using (var listener = new Socket(SocketType.Stream, ProtocolType.Tcp))
+            {
+                listener.Bind(new IPEndPoint(IPAddress.IPv6Any, 0));
+                listener.Listen(1);
+                var acceptTask = Task.Run(async () =>
+                {
+                    using (var awaitable = new SocketAwaitable())
+                    {
+                        var awaiter = awaitable.GetAwaiter();
+                        Assert.IsTrue(awaiter.IsCompleted);
+                        Assert.AreEqual(awaiter.GetResult(), SocketError.Success);
+
+                        var a = listener.AcceptAsync(awaitable);
+                        Assert.IsFalse(awaiter.IsCompleted);
+                        Assert.AreEqual(awaiter.GetResult(), SocketError.AlreadyInProgress);
+
+                        var result = await a;
+                        Assert.IsTrue(awaiter.IsCompleted);
+                        Assert.AreEqual(awaiter.GetResult(), result);
+                    }
+                });
+
+                await Task.Delay(500);
+
+                using (var client = new Socket(SocketType.Stream, ProtocolType.Tcp))
+                {
+                    using (var awaitable = new SocketAwaitable())
+                    {
+                        awaitable.RemoteEndPoint = new IPEndPoint(IPAddress.IPv6Loopback, (listener.LocalEndPoint as IPEndPoint).Port);
+
+                        var awaiter = awaitable.GetAwaiter();
+                        Assert.IsTrue(awaiter.IsCompleted);
+                        Assert.AreEqual(awaiter.GetResult(), SocketError.Success);
+
+                        var a = client.ConnectAsync(awaitable);
+                        Assert.IsFalse(awaiter.IsCompleted);
+                        Assert.AreEqual(awaiter.GetResult(), SocketError.AlreadyInProgress);
+
+                        var result = await a;
+                        Assert.IsTrue(awaiter.IsCompleted);
+                        Assert.AreEqual(awaiter.GetResult(), result);
+                    }
+                }
+
+                await acceptTask;
             }
         }
         #endregion

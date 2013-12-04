@@ -35,6 +35,10 @@ namespace Dawn.Net.Sockets.Tests
             // Default values.
             var awaitable = new SocketAwaitable();
             Assert.IsNull(awaitable.AcceptSocket);
+
+            var awaiter = awaitable.GetAwaiter();
+            Assert.IsTrue(awaiter.IsCompleted);
+            Assert.AreEqual(awaiter.GetResult(), SocketError.Success);
         }
 
         /// <summary>
