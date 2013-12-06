@@ -284,10 +284,15 @@ namespace Dawn.Net.Sockets
                 throw new ArgumentNullException("awaitable", "Awaitable must not be null.");
 
             var a = awaitable.GetAwaiter();
-            if (!a.IsCompleted)
-                throw new InvalidOperationException("A socket operation is already in progress using the same awaitable arguments.");
+            lock (a.SyncRoot)
+            {
+                if (!a.IsCompleted)
+                    throw new InvalidOperationException(
+                        "A socket operation is already in progress using the same awaitable arguments.");
 
-            a.Reset();
+                a.Reset();
+            }
+            
             try
             {
                 if (!operation.Invoke(socket, awaitable))
