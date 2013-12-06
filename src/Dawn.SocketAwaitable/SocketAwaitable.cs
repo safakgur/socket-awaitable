@@ -110,6 +110,31 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
+        ///     Gets the exception in the case of a connection failure when a <see cref="DnsEndPoint" /> was used.
+        /// </summary>
+        public Exception ConnectByNameError
+        {
+            get { return this.Arguments.ConnectByNameError; }
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether a socket can be reused after a disconnect operation.
+        /// </summary>
+        public bool DisconnectReuseSocket
+        {
+            get { return this.Arguments.DisconnectReuseSocket; }
+            set { this.Arguments.DisconnectReuseSocket = value; }
+        }
+
+        /// <summary>
+        ///     Gets the type of socket operation most recently performed with this context object.
+        /// </summary>
+        public SocketAsyncOperation LastOperation
+        {
+            get { return this.Arguments.LastOperation; }
+        }
+
+        /// <summary>
         ///     Gets or sets the remote IP endpoint for an asynchronous operation.
         /// </summary>
         public EndPoint RemoteEndPoint
