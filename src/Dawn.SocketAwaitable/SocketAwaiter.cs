@@ -42,6 +42,12 @@ namespace Dawn.Net.Sockets
         private readonly SocketAwaitable awaitable;
 
         /// <summary>
+        ///     An object to synchronize access to the awaiter for validations.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly object syncRoot = new object();
+
+        /// <summary>
         ///     The continuation delegate that will be called after the current operation is awaited.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -66,7 +72,9 @@ namespace Dawn.Net.Sockets
             this.awaitable = awaitable;
             this.awaitable.Arguments.Completed += delegate
             {
-                this.IsCompleted = true;
+                lock (this.SyncRoot)
+                    this.IsCompleted = true;
+
                 var c = this.continuation ?? Interlocked.CompareExchange(ref this.continuation, sentinel, null);
                 if (c != null)
                     c.Invoke();
@@ -82,6 +90,14 @@ namespace Dawn.Net.Sockets
         {
             get { return this.isCompleted; }
             internal set { this.isCompleted = value; }
+        }
+
+        /// <summary>
+        ///     Gets an object to synchronize access to the awaiter for validations.
+        /// </summary>
+        internal object SyncRoot
+        {
+            get { return this.syncRoot; }
         }
         #endregion
 
