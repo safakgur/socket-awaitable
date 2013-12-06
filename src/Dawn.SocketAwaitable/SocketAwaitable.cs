@@ -54,6 +54,14 @@ namespace Dawn.Net.Sockets
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool isDisposed;
+
+        /// <summary>
+        ///     A value that indicates whether the socket operations using the <see cref="SocketAwaitable" />
+        ///     should capture the current synchronization context and attempt to marshall their continuations
+        ///     back to the captured context.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool shouldCaptureContext;
         #endregion
 
         #region Constructors
@@ -126,6 +134,32 @@ namespace Dawn.Net.Sockets
         {
             get { return this.Arguments.UserToken; }
             set { this.Arguments.UserToken = value; }
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether the socket operations using the
+        ///     <see cref="SocketAwaitable" /> should capture the current synchronization context and attempt
+        ///     to marshall their continuations back to the captured context.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        ///     A socket operation was already in progress using the current <see cref="SocketAwaitable" />.
+        /// </exception>
+        public bool ShouldCaptureContext
+        {
+            get
+            {
+                return this.shouldCaptureContext;
+            }
+
+            set
+            {
+                lock (this.awaiter.SyncRoot)
+                    if (this.awaiter.IsCompleted)
+                        this.shouldCaptureContext = value;
+                    else
+                        throw new InvalidOperationException(
+                            "A socket operation is already in progress using the same awaitable arguments.");
+            }
         }
 
         /// <summary>
