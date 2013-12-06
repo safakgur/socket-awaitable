@@ -18,6 +18,7 @@ namespace Dawn.Net.Sockets
     using System.Diagnostics;
     using System.Net.Sockets;
     using System.Security;
+    using System.Threading;
 
     /// <summary>
     ///     Provides socket extensions for easier asynchronous operations.
@@ -284,25 +285,32 @@ namespace Dawn.Net.Sockets
                 throw new ArgumentNullException("awaitable", "Awaitable must not be null.");
 
             var a = awaitable.GetAwaiter();
-            if (!a.IsCompleted)
-                throw new InvalidOperationException("A socket operation is already in progress using the same awaitable arguments.");
+            lock (a.SyncRoot)
+            {
+                if (!a.IsCompleted)
+                    throw new InvalidOperationException(
+                        "A socket operation is already in progress using the same awaitable arguments.");
 
-            a.Reset();
+                a.Reset();
+                if (awaitable.ShouldCaptureContext)
+                    a.SyncContext = SynchronizationContext.Current;
+            }
+            
             try
             {
                 if (!operation.Invoke(socket, awaitable))
-                    a.IsCompleted = true;
+                    a.Complete();
             }
             catch (SocketException x)
             {
-                a.IsCompleted = true;
+                a.Complete();
                 awaitable.Arguments.SocketError = x.SocketErrorCode != SocketError.Success
                     ? x.SocketErrorCode
                     : SocketError.SocketError;
             }
             catch (Exception)
             {
-                a.IsCompleted = true;
+                a.Complete();
                 awaitable.Arguments.SocketError = SocketError.Success;
                 throw;
             }

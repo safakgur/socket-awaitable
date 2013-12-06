@@ -42,6 +42,12 @@ namespace Dawn.Net.Sockets
         private readonly SocketAwaitable awaitable;
 
         /// <summary>
+        ///     An object to synchronize access to the awaiter for validations.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly object syncRoot = new object();
+
+        /// <summary>
         ///     The continuation delegate that will be called after the current operation is awaited.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -52,6 +58,12 @@ namespace Dawn.Net.Sockets
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool isCompleted = true;
+
+        /// <summary>
+        ///     A synchronization context for marshaling the continuation delegate to.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private SynchronizationContext syncContext;
         #endregion
 
         #region Constructors
@@ -66,10 +78,17 @@ namespace Dawn.Net.Sockets
             this.awaitable = awaitable;
             this.awaitable.Arguments.Completed += delegate
             {
-                this.IsCompleted = true;
                 var c = this.continuation ?? Interlocked.CompareExchange(ref this.continuation, sentinel, null);
                 if (c != null)
-                    c.Invoke();
+                {
+                    var syncContext = this.awaitable.ShouldCaptureContext ? this.SyncContext : null;
+                    this.Complete();
+
+                    if (syncContext != null)
+                        syncContext.Post(s => c.Invoke(), null);
+                    else
+                        c.Invoke();
+                }
             };
         }
         #endregion
@@ -81,7 +100,23 @@ namespace Dawn.Net.Sockets
         public bool IsCompleted
         {
             get { return this.isCompleted; }
-            internal set { this.isCompleted = value; }
+        }
+
+        /// <summary>
+        ///     Gets an object to synchronize access to the awaiter for validations.
+        /// </summary>
+        internal object SyncRoot
+        {
+            get { return this.syncRoot; }
+        }
+
+        /// <summary>
+        ///     Gets or sets a synchronization context for marshaling the continuation delegate to.
+        /// </summary>
+        internal SynchronizationContext SyncContext
+        {
+            get { return this.syncContext; }
+            set { this.syncContext = value; }
         }
         #endregion
 
@@ -108,7 +143,17 @@ namespace Dawn.Net.Sockets
         {
             if (this.continuation == sentinel
                 || Interlocked.CompareExchange(ref this.continuation, continuation, null) == sentinel)
-                Task.Run(continuation);
+            {
+                this.Complete();
+                if (!this.awaitable.ShouldCaptureContext)
+                    Task.Run(continuation);
+                else
+                    Task.Factory.StartNew(
+                        continuation,
+                        CancellationToken.None,
+                        TaskCreationOptions.DenyChildAttach,
+                        TaskScheduler.FromCurrentSynchronizationContext());
+            }
         }
 
         /// <summary>
@@ -118,8 +163,22 @@ namespace Dawn.Net.Sockets
         {
             this.awaitable.Arguments.AcceptSocket = null;
             this.awaitable.Arguments.SocketError = SocketError.AlreadyInProgress;
-            this.IsCompleted = false;
+            this.isCompleted = false;
             this.continuation = null;
+        }
+
+        /// <summary>
+        ///     Sets <see cref="IsCompleted" /> to true and nullifies the <see cref="syncContext" />.
+        /// </summary>
+        internal void Complete()
+        {
+            if (!this.IsCompleted)
+            {
+                if (this.awaitable.ShouldCaptureContext)
+                    this.syncContext = null;
+
+                this.isCompleted = true;
+            }
         }
         #endregion
     }
