@@ -85,14 +85,25 @@ namespace Dawn.Net.Sockets
 
         /// <summary>
         ///     Gets or sets the data buffer to use with the asynchronous socket methods.
+        ///     Setting <see cref="Buffer" /> makes <see cref="Transferred" /> unreliable, so make sure you
+        ///     checked <see cref="Transferred" /> before changing the value of <see cref="Buffer" />.
         /// </summary>
         /// <exception cref="ArgumentException">
         ///     <paramref name="value" />'s array is null.
         /// </exception>
         public ArraySegment<byte> Buffer
         {
-            get { return new ArraySegment<byte>(this.Arguments.Buffer ?? emptyArray, this.Arguments.Offset, this.Arguments.Count); }
-            set { this.Arguments.SetBuffer(value.Array ?? emptyArray, value.Offset, value.Count); }
+            get
+            {
+                lock (this.syncRoot)
+                    return new ArraySegment<byte>(this.Arguments.Buffer ?? emptyArray, this.Arguments.Offset, this.Arguments.Count);
+            }
+
+            set
+            {
+                lock (this.syncRoot)
+                    this.Arguments.SetBuffer(value.Array ?? emptyArray, value.Offset, value.Count);
+            }
         }
 
         /// <summary>
@@ -102,10 +113,17 @@ namespace Dawn.Net.Sockets
         {
             get
             {
-                return new ArraySegment<byte>(
-                    this.Arguments.Buffer ?? emptyArray,
-                    this.Arguments.Offset,
-                    this.Arguments.BytesTransferred);
+                lock (this.syncRoot)
+                {
+                    var buffer = this.Buffer;
+                    var array = buffer.Array;
+                    var offset = buffer.Offset;
+                    var count = this.Arguments.BytesTransferred;
+                    if (count > array.Length - offset)
+                        return new ArraySegment<byte>(emptyArray);
+                    else
+                        return new ArraySegment<byte>(array, offset, count);
+                }
             }
         }
 
