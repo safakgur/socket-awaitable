@@ -54,6 +54,14 @@ namespace Dawn.Net.Sockets
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool isDisposed;
+
+        /// <summary>
+        ///     A value that indicates whether the socket operations using the <see cref="SocketAwaitable" />
+        ///     should capture the current synchronization context and attempt to marshall their continuations
+        ///     back to the captured context.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool shouldCaptureContext;
         #endregion
 
         #region Constructors
@@ -77,14 +85,25 @@ namespace Dawn.Net.Sockets
 
         /// <summary>
         ///     Gets or sets the data buffer to use with the asynchronous socket methods.
+        ///     Setting <see cref="Buffer" /> makes <see cref="Transferred" /> unreliable, so make sure you
+        ///     checked <see cref="Transferred" /> before changing the value of <see cref="Buffer" />.
         /// </summary>
         /// <exception cref="ArgumentException">
         ///     <paramref name="value" />'s array is null.
         /// </exception>
         public ArraySegment<byte> Buffer
         {
-            get { return new ArraySegment<byte>(this.Arguments.Buffer ?? emptyArray, this.Arguments.Offset, this.Arguments.Count); }
-            set { this.Arguments.SetBuffer(value.Array ?? emptyArray, value.Offset, value.Count); }
+            get
+            {
+                lock (this.syncRoot)
+                    return new ArraySegment<byte>(this.Arguments.Buffer ?? emptyArray, this.Arguments.Offset, this.Arguments.Count);
+            }
+
+            set
+            {
+                lock (this.syncRoot)
+                    this.Arguments.SetBuffer(value.Array ?? emptyArray, value.Offset, value.Count);
+            }
         }
 
         /// <summary>
@@ -94,11 +113,43 @@ namespace Dawn.Net.Sockets
         {
             get
             {
-                return new ArraySegment<byte>(
-                    this.Arguments.Buffer ?? emptyArray,
-                    this.Arguments.Offset,
-                    this.Arguments.BytesTransferred);
+                lock (this.syncRoot)
+                {
+                    var buffer = this.Buffer;
+                    var array = buffer.Array;
+                    var offset = buffer.Offset;
+                    var count = this.Arguments.BytesTransferred;
+                    if (count > array.Length - offset)
+                        return new ArraySegment<byte>(emptyArray);
+                    else
+                        return new ArraySegment<byte>(array, offset, count);
+                }
             }
+        }
+
+        /// <summary>
+        ///     Gets the exception in the case of a connection failure when a <see cref="DnsEndPoint" /> was used.
+        /// </summary>
+        public Exception ConnectByNameError
+        {
+            get { return this.Arguments.ConnectByNameError; }
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether a socket can be reused after a disconnect operation.
+        /// </summary>
+        public bool DisconnectReuseSocket
+        {
+            get { return this.Arguments.DisconnectReuseSocket; }
+            set { this.Arguments.DisconnectReuseSocket = value; }
+        }
+
+        /// <summary>
+        ///     Gets the type of socket operation most recently performed with this context object.
+        /// </summary>
+        public SocketAsyncOperation LastOperation
+        {
+            get { return this.Arguments.LastOperation; }
         }
 
         /// <summary>
@@ -126,6 +177,32 @@ namespace Dawn.Net.Sockets
         {
             get { return this.Arguments.UserToken; }
             set { this.Arguments.UserToken = value; }
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether the socket operations using the
+        ///     <see cref="SocketAwaitable" /> should capture the current synchronization context and attempt
+        ///     to marshall their continuations back to the captured context.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        ///     A socket operation was already in progress using the current <see cref="SocketAwaitable" />.
+        /// </exception>
+        public bool ShouldCaptureContext
+        {
+            get
+            {
+                return this.shouldCaptureContext;
+            }
+
+            set
+            {
+                lock (this.awaiter.SyncRoot)
+                    if (this.awaiter.IsCompleted)
+                        this.shouldCaptureContext = value;
+                    else
+                        throw new InvalidOperationException(
+                            "A socket operation is already in progress using the same awaitable arguments.");
+            }
         }
 
         /// <summary>
