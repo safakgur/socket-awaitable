@@ -16,7 +16,7 @@ You can find more information about the changes I made in the Analysis section.
 
 ## Analysis
 ### SocketAwaitable Class
-SocketAwaitable is an awaitable alternative for SocketAsyncEventArgs, therefore it exposes most of its functionalities. 
+SocketAwaitable is a complete, awaitable alternative for SocketAsyncEventArgs.
 
 #### Major Differences
 These are the differences that seperate SocketAwaitable from SocketAsyncEventArgs the most.
@@ -50,7 +50,7 @@ These are the differences that seperate SocketAwaitable from SocketAsyncEventArg
     }
     ```
 
-2. SocketAwaitable has a boolean property called **ShouldCaptureContext** which, if set to true, causes the socket operations using the SocketAwaitable to capture the current synchronization context before they begin, and marshall the continuation back to the captured context.
+2. SocketAwaitable has a boolean property called **ShouldCaptureContext** which, if set to true, causes the socket operations using the SocketAwaitable to capture the current synchronization context before they begin, and marshal the continuation back to the captured context.
     ```csharp
     private async Task ConnectAsync(Socket s, EndPoint endPoint)
     {
@@ -86,9 +86,7 @@ These are the differences that seperate SocketAwaitable from SocketAsyncEventArg
                 break;
         }
         
-        // Clears all state information.
-        // In this case, the only state information is RemoteEndPoint.
-        a.Clear();
+        a.Clear(); // Clears `a.RemoteEndPoint`.
         this.pool.Add(a);
         
         return result == SocketError.Success;
