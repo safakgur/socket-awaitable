@@ -16,7 +16,7 @@ You can find more information about the changes I made in the Analysis section.
 
 ## Analysis
 ### SocketAwaitable Class
-SocketAwaitable is an awaitable alternative for SocketAsyncEventArgs, therefore it exposes most of its functionalities. 
+SocketAwaitable is a complete, awaitable alternative for SocketAsyncEventArgs.
 
 #### Major Differences
 These are the differences that seperate SocketAwaitable from SocketAsyncEventArgs the most.
@@ -50,7 +50,7 @@ These are the differences that seperate SocketAwaitable from SocketAsyncEventArg
     }
     ```
 
-2. SocketAwaitable has a boolean property called **ShouldCaptureContext** which, if set to true, causes the socket operations using the SocketAwaitable to capture the current synchronization context before they begin, and marshall the continuation back to the captured context.
+2. SocketAwaitable has a boolean property called **ShouldCaptureContext** which, if set to true, causes the socket operations using the SocketAwaitable to capture the current synchronization context before they begin, and marshal the continuation back to the captured context.
     ```csharp
     private async Task ConnectAsync(Socket s, EndPoint endPoint)
     {
@@ -86,9 +86,7 @@ These are the differences that seperate SocketAwaitable from SocketAsyncEventArg
                 break;
         }
         
-        // Clears all state information.
-        // In this case, the only state information is RemoteEndPoint.
-        a.Clear();
+        a.Clear(); // Clears `a.RemoteEndPoint`.
         this.pool.Add(a);
         
         return result == SocketError.Success;
@@ -117,7 +115,7 @@ These are the minor differences between SocketAwaitable and SocketAsyncEventArgs
 
 2. Buffer, Offset and Count properties of SocketAsyncEventArgs are exposed as one ArraySegment&lt;byte&gt; property called **Buffer** in SocketAwaitable. It's Array property is never null and returns a static, empty array if no buffer is specified. SetBuffer also doesn't exist in SocketAwaitable. Calling Clear method clears Buffer.
 
-   Like Buffer, BytesTransferred is also exposed as an ArraySegment&lt;byte&gt; property called **Transferred**, which provides the same array and offset with Buffer but gives the number of the transferred bytes as count. Since calling Clear method clears Buffer, it also causes Transferred to return empty.
+   Like Buffer, BytesTransferred is also exposed as an ArraySegment&lt;byte&gt; property called **Transferred**, which provides the same array and offset with the used buffer but gives the number of the transferred bytes as count.
     ```csharp
     private readonly SocketAwaitablePool pool = new SocketAwaitablePool(10000);
     private readonly BufferManager bufferManager = new BufferManager(1024, 10000);
@@ -159,7 +157,7 @@ These are the minor differences between SocketAwaitable and SocketAsyncEventArgs
     }
     ```
 
-3. **BufferList** is not supported in SocketAwaitable. One reason for this is that SocketAsyncEventArgs copies the specified list into an array on assignment and internally, uses the copied array. This means the methods that manipulate the list like `e.BufferList.Add(list)` doesn't work, which I think is a bad decision regarding API design. Also, using BlockingBufferManager class to manage buffers makes using BufferList redundant.
+3. **BufferList** is not supported in SocketAwaitable. One reason for this is that SocketAsyncEventArgs copies the specified list into an array on assignment and internally, uses the copied array. This means the methods that manipulate the list like `e.BufferList.Add(buffer)` doesn't work, which I think is a bad decision regarding API design. Also, using BlockingBufferManager class to manage buffers makes using BufferList redundant.
 4. **ConnectSocket** is not supported in SocketAwaitable, since it has no use in an awaitable class like it has in SocketAsyncEventArgs.
 5. **SocketClientAccessPolicyProtocol** is not supported in SocketAwaitable, since it's already marked with ObsoleteAttribute and there is no point in exposing it.
 6. **SocketError** is not supported in SocketAwaitable, since it is the return type of SocketAwaiter.GetResult. That means the users can check the result of every asynchronous socket operation, right after awaiting the operation. Therefore, there is no need to have SocketError as a property of SocketAwaitable.
@@ -297,6 +295,14 @@ Task.Delay(1000).ContinueWith(t => manager.ReleaseBuffer(buffers[0]));
 // released which will happen in ~1 second.
 var buffer3 = manager.GetBuffer();
 ```
+
+## Contributions
+You can create a pull request if you're interested in contributing the project.
+
+1. All the classes must comply with [StyleCop](http://stylecop.codeplex.com) rules. (Yes, I have some [exceptions](src/Settings.StyleCop))
+2. I use [SemVer](http://semver.org) and Vincent Driessen's [branching model](http://nvie.com/posts/a-successful-git-branching-model/).
+
+You can also create an [issue](https://github.com/safakgur/Dawn.SocketAwaitable/issues/new) or [send me an e-mail](mailto:safak9ur@gmail.com) for feature requests.
 
 ## License
 See [License.txt](License.txt).

@@ -30,7 +30,7 @@ namespace Dawn.Net.Sockets
         ///     A cached, empty array of bytes.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private static readonly byte[] emptyArray = new byte[0];
+        internal static readonly byte[] EmptyArray = new byte[0];
         
         /// <summary>
         ///     Asynchronous socket arguments for internal use.
@@ -48,6 +48,11 @@ namespace Dawn.Net.Sockets
         ///     An awaiter that waits the completions of asynchronous socket operations.
         /// </summary>
         private readonly SocketAwaiter awaiter;
+
+        /// <summary>
+        ///     The data buffer segment that holds the transferred bytes.
+        /// </summary>
+        private ArraySegment<byte> transferred;
 
         /// <summary>
         ///     A value indicating whether the <see cref="SocketAwaitable" /> is disposed.
@@ -85,46 +90,29 @@ namespace Dawn.Net.Sockets
 
         /// <summary>
         ///     Gets or sets the data buffer to use with the asynchronous socket methods.
-        ///     Setting <see cref="Buffer" /> makes <see cref="Transferred" /> unreliable, so make sure you
-        ///     checked <see cref="Transferred" /> before changing the value of <see cref="Buffer" />.
         /// </summary>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="value" />'s array is null.
-        /// </exception>
         public ArraySegment<byte> Buffer
         {
             get
             {
                 lock (this.syncRoot)
-                    return new ArraySegment<byte>(this.Arguments.Buffer ?? emptyArray, this.Arguments.Offset, this.Arguments.Count);
+                    return new ArraySegment<byte>(this.Arguments.Buffer ?? EmptyArray, this.Arguments.Offset, this.Arguments.Count);
             }
 
             set
             {
                 lock (this.syncRoot)
-                    this.Arguments.SetBuffer(value.Array ?? emptyArray, value.Offset, value.Count);
+                    this.Arguments.SetBuffer(value.Array ?? EmptyArray, value.Offset, value.Count);
             }
         }
 
         /// <summary>
-        ///     Gets the segment of the data buffer that holds the transferred bytes.
+        ///     Gets the data buffer segment that holds the transferred bytes.
         /// </summary>
         public ArraySegment<byte> Transferred
         {
-            get
-            {
-                lock (this.syncRoot)
-                {
-                    var buffer = this.Buffer;
-                    var array = buffer.Array;
-                    var offset = buffer.Offset;
-                    var count = this.Arguments.BytesTransferred;
-                    if (count > array.Length - offset)
-                        return new ArraySegment<byte>(emptyArray);
-                    else
-                        return new ArraySegment<byte>(array, offset, count);
-                }
-            }
+            get { return this.transferred; }
+            internal set { this.transferred = value; }
         }
 
         /// <summary>
@@ -173,6 +161,7 @@ namespace Dawn.Net.Sockets
         /// <summary>
         ///     Gets or sets a user or application object associated with this asynchronous socket operation.
         /// </summary>
+        [Obsolete("User token has no use in an awaitable class and it will be removed with the next major version.")]
         public object UserToken
         {
             get { return this.Arguments.UserToken; }
@@ -224,16 +213,19 @@ namespace Dawn.Net.Sockets
 
         #region Methods
         /// <summary>
-        ///     Clears the buffer, accepted socket, remote endpoint, socket flags and user token to prepare
+        ///     Clears the buffer, accepted socket, remote endpoint and socket flags to prepare
         ///     <see cref="SocketAwaitable" /> for pooling.
         /// </summary>
         public void Clear()
         {
             this.Arguments.AcceptSocket = null;
-            this.Arguments.SetBuffer(emptyArray, 0, 0);
+            this.Arguments.SetBuffer(EmptyArray, 0, 0);
             this.RemoteEndPoint = null;
             this.SocketFlags = SocketFlags.None;
-            this.UserToken = null;
+            this.Transferred = new ArraySegment<byte>(EmptyArray);
+
+            // TODO: Remove with SocketAwaitable.UserToken.
+            this.Arguments.UserToken = null;
         }
 
         /// <summary>
