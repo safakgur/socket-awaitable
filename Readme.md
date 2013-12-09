@@ -69,7 +69,7 @@ These are the differences that seperate SocketAwaitable from SocketAsyncEventArg
     }
     ```
 
-3. SocketAwaitable has a **Clear** method that clears AcceptSocket, Buffer, RemoteEndPoint, SocketFlags and UserToken to prepare awaitable arguments for pooling.
+3. SocketAwaitable has a **Clear** method that clears AcceptSocket, Buffer, RemoteEndPoint and SocketFlags to prepare awaitable arguments for pooling.
     ```csharp
     private readonly SocketAwaitablePool pool = new SocketAwaitablePool();
 
@@ -158,7 +158,7 @@ These are the minor differences between SocketAwaitable and SocketAsyncEventArgs
     ```
 
 3. **BufferList** is not supported in SocketAwaitable. One reason for this is that SocketAsyncEventArgs copies the specified list into an array on assignment and internally, uses the copied array. This means the methods that manipulate the list like `e.BufferList.Add(buffer)` doesn't work, which I think is a bad decision regarding API design. Also, using BlockingBufferManager class to manage buffers makes using BufferList redundant.
-4. **ConnectSocket** is not supported in SocketAwaitable, since it has no use in an awaitable class like it has in SocketAsyncEventArgs.
+4. **ConnectSocket** and **UserToken** are not supported in SocketAwaitable, since they have no use in an awaitable class like they had in SocketAsyncEventArgs.
 5. **SocketClientAccessPolicyProtocol** is not supported in SocketAwaitable, since it's already marked with ObsoleteAttribute and there is no point in exposing it.
 6. **SocketError** is not supported in SocketAwaitable, since it is the return type of SocketAwaiter.GetResult. That means the users can check the result of every asynchronous socket operation, right after awaiting the operation. Therefore, there is no need to have SocketError as a property of SocketAwaitable.
 
@@ -170,7 +170,6 @@ These are the features of SocketAsyncEventArgs that are exposed by SocketAwaitab
 * **LastOperation** property
 * **RemoteEndPoint** property
 * **SocketFlags** property
-* **UserToken** property (may be removed in future)
 * **Dispose** method
 
 #### Currently Unsupported
