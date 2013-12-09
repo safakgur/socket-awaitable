@@ -127,26 +127,6 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests <see cref="SocketAwaitable.UserToken" />.
-        /// </summary>
-        [TestMethod]
-        public void TestUserToken()
-        {
-            // Default value.
-            var awaitable = new SocketAwaitable();
-            Assert.IsNull(awaitable.UserToken);
-
-            // Assign value.
-            var token = new { Property = "Value" };
-            awaitable.UserToken = token;
-            Assert.AreSame(awaitable.UserToken, token);
-
-            // Clear awaitable.
-            awaitable.Clear();
-            Assert.IsNull(awaitable.UserToken);
-        }
-
-        /// <summary>
         ///     Tests <see cref="SocketAwaitable.GetAwaiter" />.
         /// </summary>
         [TestMethod]

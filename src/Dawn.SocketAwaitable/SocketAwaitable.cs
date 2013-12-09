@@ -161,6 +161,7 @@ namespace Dawn.Net.Sockets
         /// <summary>
         ///     Gets or sets a user or application object associated with this asynchronous socket operation.
         /// </summary>
+        [Obsolete("User token has no use in an awaitable class and it will be removed with the next major version.")]
         public object UserToken
         {
             get { return this.Arguments.UserToken; }
@@ -212,7 +213,7 @@ namespace Dawn.Net.Sockets
 
         #region Methods
         /// <summary>
-        ///     Clears the buffer, accepted socket, remote endpoint, socket flags and user token to prepare
+        ///     Clears the buffer, accepted socket, remote endpoint and socket flags to prepare
         ///     <see cref="SocketAwaitable" /> for pooling.
         /// </summary>
         public void Clear()
@@ -222,7 +223,9 @@ namespace Dawn.Net.Sockets
             this.RemoteEndPoint = null;
             this.SocketFlags = SocketFlags.None;
             this.Transferred = new ArraySegment<byte>(EmptyArray);
-            this.UserToken = null;
+
+            // TODO: Remove with SocketAwaitable.UserToken.
+            this.Arguments.UserToken = null;
         }
 
         /// <summary>
