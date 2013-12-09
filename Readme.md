@@ -157,7 +157,7 @@ These are the minor differences between SocketAwaitable and SocketAsyncEventArgs
     }
     ```
 
-3. **BufferList** is not supported in SocketAwaitable. One reason for this is that SocketAsyncEventArgs copies the specified list into an array on assignment and internally, uses the copied array. This means the methods that manipulate the list like `e.BufferList.Add(list)` doesn't work, which I think is a bad decision regarding API design. Also, using BlockingBufferManager class to manage buffers makes using BufferList redundant.
+3. **BufferList** is not supported in SocketAwaitable. One reason for this is that SocketAsyncEventArgs copies the specified list into an array on assignment and internally, uses the copied array. This means the methods that manipulate the list like `e.BufferList.Add(buffer)` doesn't work, which I think is a bad decision regarding API design. Also, using BlockingBufferManager class to manage buffers makes using BufferList redundant.
 4. **ConnectSocket** is not supported in SocketAwaitable, since it has no use in an awaitable class like it has in SocketAsyncEventArgs.
 5. **SocketClientAccessPolicyProtocol** is not supported in SocketAwaitable, since it's already marked with ObsoleteAttribute and there is no point in exposing it.
 6. **SocketError** is not supported in SocketAwaitable, since it is the return type of SocketAwaiter.GetResult. That means the users can check the result of every asynchronous socket operation, right after awaiting the operation. Therefore, there is no need to have SocketError as a property of SocketAwaitable.
@@ -295,6 +295,14 @@ Task.Delay(1000).ContinueWith(t => manager.ReleaseBuffer(buffers[0]));
 // released which will happen in ~1 second.
 var buffer3 = manager.GetBuffer();
 ```
+
+## Contributions
+You can create a pull request if you're interested in contributing the project.
+
+1. All the classes must comply with [StyleCop](http://stylecop.codeplex.com) rules. (Yes, I have some [exceptions](src/Settings.StyleCop))
+2. I use [SemVer](http://semver.org) and Vincent Driessen's [branching model](http://nvie.com/posts/a-successful-git-branching-model/).
+
+You can also create an [issue](https://github.com/safakgur/Dawn.SocketAwaitable/issues/new) or [send me an e-mail](mailto:safak9ur@gmail.com) for feature requests.
 
 ## License
 See [License.txt](License.txt).
