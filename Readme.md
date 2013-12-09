@@ -115,7 +115,7 @@ These are the minor differences between SocketAwaitable and SocketAsyncEventArgs
 
 2. Buffer, Offset and Count properties of SocketAsyncEventArgs are exposed as one ArraySegment&lt;byte&gt; property called **Buffer** in SocketAwaitable. It's Array property is never null and returns a static, empty array if no buffer is specified. SetBuffer also doesn't exist in SocketAwaitable. Calling Clear method clears Buffer.
 
-   Like Buffer, BytesTransferred is also exposed as an ArraySegment&lt;byte&gt; property called **Transferred**, which provides the same array and offset with Buffer but gives the number of the transferred bytes as count. Since calling Clear method clears Buffer, it also causes Transferred to return empty.
+   Like Buffer, BytesTransferred is also exposed as an ArraySegment&lt;byte&gt; property called **Transferred**, which provides the same array and offset with the used buffer but gives the number of the transferred bytes as count.
     ```csharp
     private readonly SocketAwaitablePool pool = new SocketAwaitablePool(10000);
     private readonly BufferManager bufferManager = new BufferManager(1024, 10000);

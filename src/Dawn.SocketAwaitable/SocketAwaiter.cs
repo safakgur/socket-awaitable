@@ -163,17 +163,24 @@ namespace Dawn.Net.Sockets
         {
             this.awaitable.Arguments.AcceptSocket = null;
             this.awaitable.Arguments.SocketError = SocketError.AlreadyInProgress;
+            this.awaitable.Transferred = new ArraySegment<byte>(SocketAwaitable.EmptyArray);
             this.isCompleted = false;
             this.continuation = null;
         }
 
         /// <summary>
-        ///     Sets <see cref="IsCompleted" /> to true and nullifies the <see cref="syncContext" />.
+        ///     Sets <see cref="IsCompleted" /> to true, nullifies the <see cref="syncContext" /> and updates
+        ///     <see cref="SocketAwaitable.Transferred" />.
         /// </summary>
         internal void Complete()
         {
             if (!this.IsCompleted)
             {
+                var buffer = this.awaitable.Buffer;
+                this.awaitable.Transferred = buffer.Count > 0
+                    ? new ArraySegment<byte>(buffer.Array, buffer.Offset, this.awaitable.Arguments.BytesTransferred)
+                    : buffer;
+
                 if (this.awaitable.ShouldCaptureContext)
                     this.syncContext = null;
 
