@@ -1,16 +1,5 @@
-﻿// Copyright
-// ----------------------------------------------------------------------------------------------------------
-//  <copyright file="SocketAwaiter.cs" company="https://github.com/safakgur/Dawn.SocketAwaitable">
-//      MIT
-//  </copyright>
-//  <license>
-//      This source code is subject to terms and conditions of The MIT License (MIT).
-//      A copy of the license can be found in the License.txt file at the root of this distribution.
-//  </license>
-//  <summary>
-//      Provides an class for awaiting asynchronous socket arguments.
-//  </summary>
-// ----------------------------------------------------------------------------------------------------------
+﻿// Copyright © 2013 Şafak Gür. All rights reserved.
+// Use of this source code is governed by the MIT License (MIT).
 
 namespace Dawn.Net.Sockets
 {
@@ -23,7 +12,7 @@ namespace Dawn.Net.Sockets
 
     /// <summary>
     ///     Provides an object that waits for the completion of a <see cref="SocketAwaitable" />.
-    ///     This class is not thread-safe, therefore it doesn't support multiple concurrent awaiters.
+    ///     This class is not thread-safe: It doesn't support multiple concurrent awaiters.
     /// </summary>
     [DebuggerDisplay("Completed: {IsCompleted}")]
     public sealed class SocketAwaiter : INotifyCompletion
@@ -48,7 +37,8 @@ namespace Dawn.Net.Sockets
         private readonly object syncRoot = new object();
 
         /// <summary>
-        ///     The continuation delegate that will be called after the current operation is awaited.
+        ///     The continuation delegate that will be called after the current operation is
+        ///     awaited.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Action continuation;
@@ -78,12 +68,16 @@ namespace Dawn.Net.Sockets
             this.awaitable = awaitable;
             this.awaitable.Arguments.Completed += delegate
             {
-                var c = this.continuation ?? Interlocked.CompareExchange(ref this.continuation, sentinel, null);
+                var c = this.continuation
+                    ?? Interlocked.CompareExchange(ref this.continuation, sentinel, null);
+
                 if (c != null)
                 {
-                    var syncContext = this.awaitable.ShouldCaptureContext ? this.SyncContext : null;
-                    this.Complete();
+                    var syncContext = this.awaitable.ShouldCaptureContext
+                        ? this.SyncContext
+                        : null;
 
+                    this.Complete();
                     if (syncContext != null)
                         syncContext.Post(s => c.Invoke(), null);
                     else
@@ -133,8 +127,8 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Gets invoked when the asynchronous operation is completed and runs the specified delegate as
-        ///     continuation.
+        ///     Gets invoked when the asynchronous operation is completed and runs the specified
+        ///     delegate as continuation.
         /// </summary>
         /// <param name="continuation">
         ///     Continuation to run.
@@ -142,7 +136,10 @@ namespace Dawn.Net.Sockets
         void INotifyCompletion.OnCompleted(Action continuation)
         {
             if (this.continuation == sentinel
-                || Interlocked.CompareExchange(ref this.continuation, continuation, null) == sentinel)
+                || Interlocked.CompareExchange(
+                       ref this.continuation,
+                       continuation,
+                       null) == sentinel)
             {
                 this.Complete();
                 if (!this.awaitable.ShouldCaptureContext)
@@ -169,17 +166,20 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Sets <see cref="IsCompleted" /> to true, nullifies the <see cref="syncContext" /> and updates
-        ///     <see cref="SocketAwaitable.Transferred" />.
+        ///     Sets <see cref="IsCompleted" /> to true, nullifies the <see cref="syncContext" />
+        ///     and updates <see cref="SocketAwaitable.Transferred" />.
         /// </summary>
         internal void Complete()
         {
             if (!this.IsCompleted)
             {
                 var buffer = this.awaitable.Buffer;
-                this.awaitable.Transferred = buffer.Count > 0
-                    ? new ArraySegment<byte>(buffer.Array, buffer.Offset, this.awaitable.Arguments.BytesTransferred)
-                    : buffer;
+                this.awaitable.Transferred = buffer.Count == 0
+                    ? buffer
+                    : new ArraySegment<byte>(
+                        buffer.Array,
+                        buffer.Offset,
+                        this.awaitable.Arguments.BytesTransferred);
 
                 if (this.awaitable.ShouldCaptureContext)
                     this.syncContext = null;
