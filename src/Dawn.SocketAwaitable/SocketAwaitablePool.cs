@@ -1,16 +1,5 @@
-﻿// Copyright
-// ----------------------------------------------------------------------------------------------------------
-//  <copyright file="SocketAwaitablePool.cs" company="https://github.com/safakgur/Dawn.SocketAwaitable">
-//      MIT
-//  </copyright>
-//  <license>
-//      This source code is subject to terms and conditions of The MIT License (MIT).
-//      A copy of the license can be found in the License.txt file at the root of this distribution.
-//  </license>
-//  <summary>
-//      Provides a class that represents a thread-safe pool of awaitable socket arguments.
-//  </summary>
-// ----------------------------------------------------------------------------------------------------------
+﻿﻿// Copyright © 2013 Şafak Gür. All rights reserved.
+// Use of this source code is governed by the MIT License (MIT).
 
 namespace Dawn.Net.Sockets
 {
@@ -24,7 +13,8 @@ namespace Dawn.Net.Sockets
     ///     Represents a thread-safe pool of awaitable socket arguments.
     /// </summary>
     [DebuggerDisplay("Count: {Count}")]
-    public sealed class SocketAwaitablePool : ICollection, IDisposable, IEnumerable<SocketAwaitable>
+    public sealed class SocketAwaitablePool
+        : ICollection, IDisposable, IEnumerable<SocketAwaitable>
     {
         #region Fields
         /// <summary>
@@ -72,7 +62,8 @@ namespace Dawn.Net.Sockets
 
         #region Properties
         /// <summary>
-        ///     Gets the number of awaitable socket arguments in the <see cref="SocketAwaitablePool" />.
+        ///     Gets the number of awaitable socket arguments in the
+        ///     <see cref="SocketAwaitablePool" />.
         /// </summary>
         public int Count
         {
@@ -96,8 +87,9 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Gets a value indicating whether access to the <see cref="ICollection" /> is synchronized with
-        ///     the <see cref="ICollection.SyncRoot" /> property. This property always returns false.
+        ///     Gets a value indicating whether access to the <see cref="ICollection" /> is
+        ///     synchronized with the <see cref="ICollection.SyncRoot" /> property.
+        ///     This property always returns false.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         bool ICollection.IsSynchronized
@@ -106,13 +98,14 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Gets an object that can be used to synchronize access to the <see cref="ICollection" />.
-        ///     This property is not supported.
+        ///     Gets an object that can be used to synchronize access to the
+        ///     <see cref="ICollection" />. This property is not supported.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         object ICollection.SyncRoot
         {
-            get { throw new NotSupportedException("Synchronization using SyncRoot is not supported."); }
+            get { throw new NotSupportedException(
+                "Synchronization using SyncRoot is not supported."); }
         }
         #endregion
 
@@ -129,7 +122,9 @@ namespace Dawn.Net.Sockets
         public void Add(SocketAwaitable awaitable)
         {
             if (awaitable == null)
-                throw new ArgumentNullException("awaitable", "Awaitable socket arguments to pull must not be null.");
+                throw new ArgumentNullException(
+                    "awaitable",
+                    "Awaitable socket arguments to pull must not be null.");
 
             lock (this.bag)
                 if (!this.IsDisposed)
@@ -160,11 +155,12 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Copies the pool elements to an existing one-dimensional array, starting at the specified offset.
+        ///     Copies the pool elements to an existing one-dimensional array, starting at the
+        ///     specified offset.
         /// </summary>
         /// <param name="array">
-        ///     The one-dimensional array of awaitable socket arguments that is the destination of the
-        ///     arguments copied from the pool. Array must have zero-based indexing.
+        ///     The one-dimensional array of awaitable socket arguments that is the destination of
+        ///     the arguments copied from the pool. Array must have zero-based indexing.
         /// </param>
         /// <param name="offset">
         ///     The zero-based index in <paramref name="array" /> of which copying begins.
@@ -179,7 +175,8 @@ namespace Dawn.Net.Sockets
         ///     <paramref name="array" /> is not a single-dimensional array of
         ///     <see cref="SocketAwaitable" /> instances.
         ///     -or-
-        ///     <paramref name="offset" /> is equal to or greater than the length of <paramref name="array" />
+        ///     <paramref name="offset" /> is equal to or greater than the length of
+        ///     <paramref name="array" />
         ///     -or-
         ///     The number of elements in the source pool is greater than the available space from
         ///     <paramref name="offset" /> to the end of <paramref name="array" />.
@@ -196,9 +193,13 @@ namespace Dawn.Net.Sockets
                 throw new ArgumentOutOfRangeException("index", offset, "Index must not be null.");
 
             if (!(array is SocketAwaitable[]))
-                throw new ArgumentException(
-                    "Array must be a single-dimensional array of: " + typeof(SocketAwaitablePool).FullName,
-                    "array");
+            {
+                var message = string.Format(
+                    "Array must be a single-dimensional array of `{0}`.",
+                    typeof(SocketAwaitable).FullName);
+
+                throw new ArgumentException(message, "array");
+            }
 
             lock (this.bag)
                 if (!this.IsDisposed)
@@ -225,7 +226,8 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Returns a non-generic enumerator that iterates through the <see cref="SocketAwaitablePool" />.
+        ///     Returns a non-generic enumerator that iterates through the
+        ///     <see cref="SocketAwaitablePool" />.
         /// </summary>
         /// <returns>
         ///     An enumerator for the contents of the <see cref="SocketAwaitablePool" />.
