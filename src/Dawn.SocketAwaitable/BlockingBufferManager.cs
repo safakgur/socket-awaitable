@@ -1,16 +1,5 @@
-﻿// Copyright
-// ----------------------------------------------------------------------------------------------------------
-//  <copyright file="BlockingBufferManager.cs" company="https://github.com/safakgur/Dawn.SocketAwaitable">
-//      MIT
-//  </copyright>
-//  <license>
-//      This source code is subject to terms and conditions of The MIT License (MIT).
-//      A copy of the license can be found in the License.txt file at the root of this distribution.
-//  </license>
-//  <summary>
-//      Provides a class that represents a thread-safe pool of awaitable socket arguments.
-//  </summary>
-// ----------------------------------------------------------------------------------------------------------
+﻿﻿// Copyright 2013 Şafak Gür. All rights reserved.
+// Use of this source code is governed by the MIT License (MIT).
 
 namespace Dawn.Net.Sockets
 {
@@ -23,7 +12,7 @@ namespace Dawn.Net.Sockets
     ///     Represents a buffer manager that when a buffer is requested, blocks the calling thread until a
     ///     buffer is available.
     /// </summary>
-    [DebuggerDisplay("Buffer Size: {BufferSize} | Available: {AvailableBuffers} | Disposed: {IsDisposed}")]
+    [DebuggerDisplay("Available: {AvailableBuffers} * {BufferSize}B | Disposed: {IsDisposed}")]
     public sealed class BlockingBufferManager : IDisposable
     {
         #region Fields
@@ -40,7 +29,8 @@ namespace Dawn.Net.Sockets
         private readonly int bufferSize;
 
         /// <summary>
-        ///     Data block that provides the underlying storage for the buffers provided by the buffer manager.
+        ///     Data block that provides the underlying storage for the buffers provided by the
+        ///     buffer manager.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly byte[] data;
@@ -58,7 +48,8 @@ namespace Dawn.Net.Sockets
         private readonly ConcurrentDictionary<int, int> usedIndices;
 
         /// <summary>
-        ///     A value indicating whether the <see cref="BlockingBufferManager.Dispose" /> has been called.
+        ///     A value indicating whether the <see cref="BlockingBufferManager.Dispose" /> has
+        ///     been called.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool isDisposed;
@@ -80,10 +71,16 @@ namespace Dawn.Net.Sockets
         public BlockingBufferManager(int bufferSize, int bufferCount)
         {
             if (bufferSize < 1)
-                throw new ArgumentOutOfRangeException("bufferSize", bufferSize, "Buffer size must not be less than one.");
+                throw new ArgumentOutOfRangeException(
+                    "bufferSize",
+                    bufferSize,
+                    "Buffer size must not be less than one.");
 
             if (bufferCount < 1)
-                throw new ArgumentOutOfRangeException("bufferCount", bufferCount, "Buffer count must not be less than one.");
+                throw new ArgumentOutOfRangeException(
+                    "bufferCount",
+                    bufferCount,
+                    "Buffer count must not be less than one.");
 
             this.bufferSize = bufferSize;
             this.data = new byte[bufferSize * bufferCount];
@@ -117,7 +114,8 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Gets a value indicating whether the <see cref="BlockingBufferManager" /> is disposed.
+        ///     Gets a value indicating whether the <see cref="BlockingBufferManager" /> is
+        ///     disposed.
         /// </summary>
         public bool IsDisposed
         {
@@ -127,10 +125,12 @@ namespace Dawn.Net.Sockets
 
         #region Methods
         /// <summary>
-        ///     Gets an available buffer. This method blocks the calling thread until a buffer becomes available.
+        ///     Gets an available buffer. This method blocks the calling thread until a buffer
+        ///     becomes available.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ArraySegment&lt;T&gt;" /> with <see cref="BufferSize" /> as its count.
+        ///     An <see cref="ArraySegment&lt;T&gt;" /> with <see cref="BufferSize" /> as its
+        ///     count.
         /// </returns>
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="BlockingBufferManager" /> has been disposed.
@@ -162,8 +162,8 @@ namespace Dawn.Net.Sockets
         ///     Buffer to release.
         /// </param>
         /// <exception cref="ArgumentException">
-        ///     <paramref name="buffer" />'s array is null, count is not <see cref="BufferSize" />, or the
-        ///     offset is invalid; i.e. not taken from the current buffer manager.
+        ///     <paramref name="buffer" />'s array is null, count is not <see cref="BufferSize" />,
+        ///     or the offset is invalid; i.e. not taken from the current buffer manager.
         /// </exception>
         /// <exception cref="ObjectDisposedException">
         ///     The <see cref="BlockingBufferManager" /> has been disposed.
@@ -178,7 +178,9 @@ namespace Dawn.Net.Sockets
             if (buffer.Array != this.data
                 || buffer.Count != this.BufferSize
                 || !this.usedIndices.TryRemove(buffer.Offset, out offset))
-                throw new ArgumentException("Buffer is not taken from the current buffer manager.", "buffer");
+                throw new ArgumentException(
+                    "Buffer is not taken from the current buffer manager.",
+                    "buffer");
 
             try
             {
@@ -191,9 +193,10 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Releases all resources used by the current instance of <see cref="BlockingBufferManager" />.
-        ///     Underlying data block is an exception if it's used in unmanaged operations that require
-        ///     pinning the buffer (e.g. <see cref="System.Net.Sockets.Socket.ReceiveAsync" />).
+        ///     Releases all resources used by the current instance of
+        ///     <see cref="BlockingBufferManager" />. Underlying data block is an exception if it's
+        ///     used in unmanaged operations that require pinning the buffer (e.g.
+        ///     <see cref="System.Net.Sockets.Socket.ReceiveAsync" />).
         /// </summary>
         [SuppressMessage(
             "Microsoft.Usage",
