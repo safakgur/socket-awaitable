@@ -65,6 +65,7 @@ namespace Dawn.Net.Sockets
         public SocketAwaitable()
         {
             this.awaiter = new SocketAwaiter(this);
+            this.transferred = new ArraySegment<byte>(EmptyArray);
         }
         #endregion
 
