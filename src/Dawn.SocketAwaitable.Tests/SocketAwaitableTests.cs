@@ -1,16 +1,5 @@
-﻿// Copyright
-// ----------------------------------------------------------------------------------------------------------
-//  <copyright file="SocketAwaitableTests.cs" company="https://github.com/safakgur/Dawn.SocketAwaitable">
-//      MIT
-//  </copyright>
-//  <license>
-//      This source code is subject to terms and conditions of The MIT License (MIT).
-//      A copy of the license can be found in the License.txt file at the root of this distribution.
-//  </license>
-//  <summary>
-//      Provides a class that contains unit tests for awaitable socket arguments.
-//  </summary>
-// ----------------------------------------------------------------------------------------------------------
+﻿// Copyright © 2013 Şafak Gür. All rights reserved.
+// Use of this source code is governed by the MIT License (MIT).
 
 namespace Dawn.Net.Sockets.Tests
 {

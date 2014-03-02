@@ -1,16 +1,5 @@
-﻿// Copyright
-// ----------------------------------------------------------------------------------------------------------
-//  <copyright file="BlockingBufferManagerTests.cs" company="https://github.com/safakgur/Dawn.SocketAwaitable">
-//      MIT
-//  </copyright>
-//  <license>
-//      This source code is subject to terms and conditions of The MIT License (MIT).
-//      A copy of the license can be found in the License.txt file at the root of this distribution.
-//  </license>
-//  <summary>
-//      Provides a class that contains unit tests for the blocking buffer manager.
-//  </summary>
-// ----------------------------------------------------------------------------------------------------------
+﻿// Copyright © 2013 Şafak Gür. All rights reserved.
+// Use of this source code is governed by the MIT License (MIT).
 
 namespace Dawn.Net.Sockets.Tests
 {
@@ -41,7 +30,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests the constructor of <see cref="BlockingBufferManager" /> class by specifying zero as size.
+        ///     Tests the constructor of <see cref="BlockingBufferManager" /> class by specifying
+        ///     zero as size.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
@@ -54,7 +44,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests the constructor of <see cref="BlockingBufferManager" /> class by specifying zero as count.
+        ///     Tests the constructor of <see cref="BlockingBufferManager" /> class by specifying
+        ///     zero as count.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
@@ -81,7 +72,9 @@ namespace Dawn.Net.Sockets.Tests
             Assert.AreEqual(manager.AvailableBuffers, 0);
 
             // Start releasing every buffer after one second.
-            Task.Delay(1000).ContinueWith(t => Parallel.For(0, count, i => manager.ReleaseBuffer(buffers[i])));
+            Task.Delay(1000).ContinueWith(t =>
+                Parallel.For(0, count, i => manager.ReleaseBuffer(buffers[i])));
+
             Assert.AreEqual(manager.AvailableBuffers, 0);
 
             // Take buffers as they become available, block the thread as needed.
@@ -91,8 +84,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests disposing the <see cref="BlockingBufferManager" /> and attempting to take a new buffer
-        ///     after that.
+        ///     Tests disposing the <see cref="BlockingBufferManager" /> and attempting to take a
+        ///     new buffer after that.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ObjectDisposedException))]
@@ -106,8 +99,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests disposing the <see cref="BlockingBufferManager" /> and attempting to release a buffer
-        ///     after that.
+        ///     Tests disposing the <see cref="BlockingBufferManager" /> and attempting to release
+        ///     a buffer after that.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ObjectDisposedException))]
@@ -122,8 +115,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests disposing the <see cref="BlockingBufferManager" /> while another thread was waiting for
-        ///     a buffer to become available.
+        ///     Tests disposing the <see cref="BlockingBufferManager" /> while another thread was
+        ///     waiting for a buffer to become available.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ObjectDisposedException))]

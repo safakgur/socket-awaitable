@@ -1,17 +1,5 @@
-﻿// Copyright
-// ----------------------------------------------------------------------------------------------------------
-//  <copyright file="SocketAwaitable.cs" company="https://github.com/safakgur/Dawn.SocketAwaitable">
-//      MIT
-//  </copyright>
-//  <license>
-//      This source code is subject to terms and conditions of The MIT License (MIT).
-//      A copy of the license can be found in the License.txt file at the root of this distribution.
-//  </license>
-//  <summary>
-//      Provides an awaitable, re-usable class that represents awaitable arguments for asynchronous socket
-//      operations.
-//  </summary>
-// ----------------------------------------------------------------------------------------------------------
+﻿﻿// Copyright © 2013 Şafak Gür. All rights reserved.
+// Use of this source code is governed by the MIT License (MIT).
 
 namespace Dawn.Net.Sockets
 {
@@ -31,7 +19,7 @@ namespace Dawn.Net.Sockets
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal static readonly byte[] EmptyArray = new byte[0];
-        
+
         /// <summary>
         ///     Asynchronous socket arguments for internal use.
         /// </summary>
@@ -39,7 +27,8 @@ namespace Dawn.Net.Sockets
         private readonly SocketAsyncEventArgs arguments = new SocketAsyncEventArgs();
 
         /// <summary>
-        ///     An object that can be used to synchronize access to the <see cref="SocketAwaitable" />.
+        ///     An object that can be used to synchronize access to the
+        ///     <see cref="SocketAwaitable" />.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly object syncRoot = new object();
@@ -61,9 +50,9 @@ namespace Dawn.Net.Sockets
         private bool isDisposed;
 
         /// <summary>
-        ///     A value that indicates whether the socket operations using the <see cref="SocketAwaitable" />
-        ///     should capture the current synchronization context and attempt to marshall their continuations
-        ///     back to the captured context.
+        ///     A value that indicates whether the socket operations using the
+        ///     <see cref="SocketAwaitable" /> should capture the current synchronization context
+        ///     and attempt to marshall their continuations back to the captured context.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool shouldCaptureContext;
@@ -81,7 +70,8 @@ namespace Dawn.Net.Sockets
 
         #region Properties
         /// <summary>
-        ///     Gets the socket created for accepting a connection with an asynchronous socket method.
+        ///     Gets the socket created for accepting a connection with an asynchronous socket
+        ///     method.
         /// </summary>
         public Socket AcceptSocket
         {
@@ -96,7 +86,10 @@ namespace Dawn.Net.Sockets
             get
             {
                 lock (this.syncRoot)
-                    return new ArraySegment<byte>(this.Arguments.Buffer ?? EmptyArray, this.Arguments.Offset, this.Arguments.Count);
+                    return new ArraySegment<byte>(
+                        this.Arguments.Buffer ?? EmptyArray,
+                        this.Arguments.Offset,
+                        this.Arguments.Count);
             }
 
             set
@@ -116,7 +109,8 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Gets the exception in the case of a connection failure when a <see cref="DnsEndPoint" /> was used.
+        ///     Gets the exception in the case of a connection failure when a
+        ///     <see cref="DnsEndPoint" /> was used.
         /// </summary>
         public Exception ConnectByNameError
         {
@@ -124,7 +118,8 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Gets or sets a value indicating whether a socket can be reused after a disconnect operation.
+        ///     Gets or sets a value indicating whether a socket can be reused after a disconnect
+        ///     operation.
         /// </summary>
         public bool DisconnectReuseSocket
         {
@@ -159,9 +154,11 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Gets or sets a user or application object associated with this asynchronous socket operation.
+        ///     Gets or sets a user or application object associated with this asynchronous socket
+        ///     operation.
         /// </summary>
-        [Obsolete("User token has no use in an awaitable class and it will be removed with the next major version.")]
+        [Obsolete("User token has no use in an awaitable class"
+            + " and it will be removed with the next major version.")]
         public object UserToken
         {
             get { return this.Arguments.UserToken; }
@@ -170,11 +167,12 @@ namespace Dawn.Net.Sockets
 
         /// <summary>
         ///     Gets or sets a value indicating whether the socket operations using the
-        ///     <see cref="SocketAwaitable" /> should capture the current synchronization context and attempt
-        ///     to marshall their continuations back to the captured context.
+        ///     <see cref="SocketAwaitable" /> should capture the current synchronization context
+        ///     and attempt to marshall their continuations back to the captured context.
         /// </summary>
         /// <exception cref="InvalidOperationException">
-        ///     A socket operation was already in progress using the current <see cref="SocketAwaitable" />.
+        ///     A socket operation was already in progress using the current
+        ///     <see cref="SocketAwaitable" />.
         /// </exception>
         public bool ShouldCaptureContext
         {
@@ -190,7 +188,8 @@ namespace Dawn.Net.Sockets
                         this.shouldCaptureContext = value;
                     else
                         throw new InvalidOperationException(
-                            "A socket operation is already in progress using the same awaitable arguments.");
+                            "A socket operation is already in progress"
+                            + " using the same awaitable arguments.");
             }
         }
 
