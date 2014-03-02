@@ -9,8 +9,8 @@ namespace Dawn.Net.Sockets
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    ///     Represents a buffer manager that when a buffer is requested, blocks the calling thread until a
-    ///     buffer is available.
+    ///     Represents a buffer manager that when a buffer is requested, blocks the calling thread
+    ///     until a buffer is available.
     /// </summary>
     [DebuggerDisplay("Available: {AvailableBuffers} * {BufferSize}B | Disposed: {IsDisposed}")]
     public sealed class BlockingBufferManager : IDisposable

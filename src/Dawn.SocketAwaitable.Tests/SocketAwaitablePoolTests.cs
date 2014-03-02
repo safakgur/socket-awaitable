@@ -1,16 +1,5 @@
-﻿// Copyright
-// ----------------------------------------------------------------------------------------------------------
-//  <copyright file="SocketAwaitablePoolTests.cs" company="https://github.com/safakgur/Dawn.SocketAwaitable">
-//      MIT
-//  </copyright>
-//  <license>
-//      This source code is subject to terms and conditions of The MIT License (MIT).
-//      A copy of the license can be found in the License.txt file at the root of this distribution.
-//  </license>
-//  <summary>
-//      Provides a class that contains unit tests for the awaitable socket argument pool.
-//  </summary>
-// ----------------------------------------------------------------------------------------------------------
+﻿// Copyright © 2013 Şafak Gür. All rights reserved.
+// Use of this source code is governed by the MIT License (MIT).
 
 namespace Dawn.Net.Sockets.Tests
 {
@@ -48,7 +37,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests the <see cref="SocketAwaitablePool.Add" /> method by specifying a null argument.
+        ///     Tests the <see cref="SocketAwaitablePool.Add" /> method by specifying a null
+        ///     argument.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -95,8 +85,9 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests the <see cref="ICollection.IsSynchronized" /> and <see cref="ICollection.SyncRoot" />
-        ///     properties of the <see cref="SocketAwaitablePool" /> class.
+        ///     Tests the <see cref="ICollection.IsSynchronized" /> and
+        ///     <see cref="ICollection.SyncRoot" /> properties of the
+        ///     <see cref="SocketAwaitablePool" /> class.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(NotSupportedException))]
@@ -113,8 +104,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests the <see cref="ICollection.CopyTo" /> method of the <see cref="SocketAwaitablePool" />
-        ///     class, by specifying valid arguments.
+        ///     Tests the <see cref="ICollection.CopyTo" /> method of the
+        ///     <see cref="SocketAwaitablePool" /> class, by specifying valid arguments.
         /// </summary>
         [TestMethod]
         public void TestCopyingToValidArray()
@@ -127,8 +118,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests the <see cref="ICollection.CopyTo" /> method of the <see cref="SocketAwaitablePool" />
-        ///     class, by specifying a null array.
+        ///     Tests the <see cref="ICollection.CopyTo" /> method of the
+        ///     <see cref="SocketAwaitablePool" /> class, by specifying a null array.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -139,8 +130,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests the <see cref="ICollection.CopyTo" /> method of the <see cref="SocketAwaitablePool" />
-        ///     class, by specifying a negative index.
+        ///     Tests the <see cref="ICollection.CopyTo" /> method of the
+        ///     <see cref="SocketAwaitablePool" /> class, by specifying a negative index.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
@@ -151,8 +142,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests the <see cref="ICollection.CopyTo" /> method of the <see cref="SocketAwaitablePool" />
-        ///     class, by specifying an array of integers.
+        ///     Tests the <see cref="ICollection.CopyTo" /> method of the
+        ///     <see cref="SocketAwaitablePool" /> class, by specifying an array of integers.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
@@ -163,8 +154,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests the <see cref="ICollection.CopyTo" /> method of the <see cref="SocketAwaitablePool" />
-        ///     class, by specifying a multi-dimensional array.
+        ///     Tests the <see cref="ICollection.CopyTo" /> method of the
+        ///     <see cref="SocketAwaitablePool" /> class, by specifying a multi-dimensional array.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
@@ -175,8 +166,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests the <see cref="ICollection.CopyTo" /> method of the <see cref="SocketAwaitablePool" />
-        ///     class, by specifying a jagged array.
+        ///     Tests the <see cref="ICollection.CopyTo" /> method of the
+        ///     <see cref="SocketAwaitablePool" /> class, by specifying a jagged array.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
@@ -187,8 +178,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests the <see cref="ICollection.CopyTo" /> method of the <see cref="SocketAwaitablePool" />
-        ///     class, by specifying an array that is too small.
+        ///     Tests the <see cref="ICollection.CopyTo" /> method of the
+        ///     <see cref="SocketAwaitablePool" /> class, by specifying an array that is too small.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
@@ -245,8 +236,8 @@ namespace Dawn.Net.Sockets.Tests
         }
 
         /// <summary>
-        ///     Tests <see cref="ICollection.CopyTo" /> methods of the <see cref="SocketAwaitablePool" />
-        ///     after disposing the pool.
+        ///     Tests <see cref="ICollection.CopyTo" /> methods of the
+        ///     <see cref="SocketAwaitablePool" /> after disposing the pool.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(ObjectDisposedException))]

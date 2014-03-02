@@ -1,16 +1,5 @@
-﻿// Copyright
-// ----------------------------------------------------------------------------------------------------------
-//  <copyright file="SocketExTests.cs" company="https://github.com/safakgur/Dawn.SocketAwaitable">
-//      MIT
-//  </copyright>
-//  <license>
-//      This source code is subject to terms and conditions of The MIT License (MIT).
-//      A copy of the license can be found in the License.txt file at the root of this distribution.
-//  </license>
-//  <summary>
-//      Provides a class that contains unit tests for awaitable socket extensions.
-//  </summary>
-// ----------------------------------------------------------------------------------------------------------
+﻿// Copyright © 2013 Şafak Gür. All rights reserved.
+// Use of this source code is governed by the MIT License (MIT).
 
 namespace Dawn.Net.Sockets.Tests
 {
@@ -64,7 +53,9 @@ namespace Dawn.Net.Sockets.Tests
                         var receiveResult = await accepted.ReceiveAsync(receiveAwaitable);
                         Assert.AreEqual(receiveResult, SocketError.Success);
                         Assert.AreEqual(receiveAwaitable.Transferred.Count, 1);
-                        Assert.AreEqual(receiveAwaitable.Buffer.Array[receiveAwaitable.Buffer.Offset], 7);
+                        Assert.AreEqual(
+                            receiveAwaitable.Buffer.Array[receiveAwaitable.Buffer.Offset],
+                            7);
                     }
                 });
 
@@ -73,7 +64,9 @@ namespace Dawn.Net.Sockets.Tests
                 {
                     using (var connectAwaitable = new SocketAwaitable())
                     {
-                        connectAwaitable.RemoteEndPoint = new IPEndPoint(IPAddress.IPv6Loopback, (listener.LocalEndPoint as IPEndPoint).Port);
+                        connectAwaitable.RemoteEndPoint = new IPEndPoint(
+                            IPAddress.IPv6Loopback,
+                            (listener.LocalEndPoint as IPEndPoint).Port);
 
                         var connectResult = await client.ConnectAsync(connectAwaitable);
                         Assert.AreEqual(connectResult, SocketError.Success);
@@ -84,7 +77,8 @@ namespace Dawn.Net.Sockets.Tests
                     // Send.
                     using (var sendAwaitable = new SocketAwaitable())
                     {
-                        sendAwaitable.Buffer = new ArraySegment<byte>(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 }, 7, 1);
+                        sendAwaitable.Buffer = new ArraySegment<byte>(
+                            new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 }, 7, 1);
 
                         var sendResult = await client.SendAsync(sendAwaitable);
                         Assert.AreEqual(sendResult, SocketError.Success);
@@ -134,7 +128,9 @@ namespace Dawn.Net.Sockets.Tests
                 {
                     using (var awaitable = new SocketAwaitable())
                     {
-                        awaitable.RemoteEndPoint = new IPEndPoint(IPAddress.IPv6Loopback, (listener.LocalEndPoint as IPEndPoint).Port);
+                        awaitable.RemoteEndPoint = new IPEndPoint(
+                            IPAddress.IPv6Loopback,
+                            (listener.LocalEndPoint as IPEndPoint).Port);
 
                         var awaiter = awaitable.GetAwaiter();
                         Assert.IsTrue(awaiter.IsCompleted);
