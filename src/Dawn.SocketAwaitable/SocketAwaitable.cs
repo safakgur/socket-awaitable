@@ -155,18 +155,6 @@ namespace Dawn.Net.Sockets
         }
 
         /// <summary>
-        ///     Gets or sets a user or application object associated with this asynchronous socket
-        ///     operation.
-        /// </summary>
-        [Obsolete("User token has no use in an awaitable class"
-            + " and it will be removed with the next major version.")]
-        public object UserToken
-        {
-            get { return this.Arguments.UserToken; }
-            set { this.Arguments.UserToken = value; }
-        }
-
-        /// <summary>
         ///     Gets or sets a value indicating whether the socket operations using the
         ///     <see cref="SocketAwaitable" /> should capture the current synchronization context
         ///     and attempt to marshall their continuations back to the captured context.
