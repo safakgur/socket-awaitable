@@ -190,7 +190,7 @@ namespace Dawn.Net.Sockets
                 throw new ArgumentNullException("array", "Array must not be null.");
 
             if (offset < 0)
-                throw new ArgumentOutOfRangeException("index", offset, "Index must not be null.");
+                throw new ArgumentOutOfRangeException("offset", offset, "Index must not be null.");
 
             if (!(array is SocketAwaitable[]))
             {
