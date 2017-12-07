@@ -1,4 +1,11 @@
-# <sup>Dawn.</sup>SocketAwaitable
+# SocketAwaitable
+
+## DEPRECATED
+
+[SocketTaskExtensions](https://docs.microsoft.com/dotnet/api/system.net.sockets.sockettaskextensions) class provides `Task` returning socket functions now and there are `ValueTask` returning overloads that accept the new `Span`/`Memory` types on the horizon. There is no need for the Dawn.SocketAwaitable anymore, therefore I will not be maintaining it any longer.
+
+---
+
 A library that provides utilities for taking advantage of the async/await functionality on asynchronouss socket operations.
 
 ## Background
